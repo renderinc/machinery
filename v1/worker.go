@@ -27,6 +27,7 @@ type Worker struct {
 	Concurrency       int
 	Queue             string
 	errorHandler      func(err error)
+	taskErrorHandler  func(*tasks.Signature, error)
 	preTaskHandler    func(*tasks.Signature)
 	postTaskHandler   func(*tasks.Signature)
 	preConsumeHandler func(*Worker) bool
@@ -365,7 +366,7 @@ func (worker *Worker) taskFailed(signature *tasks.Signature, taskErr error) erro
 	}
 
 	if worker.errorHandler != nil {
-		worker.errorHandler(taskErr)
+		worker.taskErrorHandler(signature, taskErr)
 	} else {
 		log.ERROR.Printf("Failed processing task %s. Error = %v", signature.UUID, taskErr)
 	}
@@ -398,6 +399,10 @@ func (worker *Worker) hasAMQPBackend() bool {
 // A default behavior is just to log the error after all the retry attempts fail
 func (worker *Worker) SetErrorHandler(handler func(err error)) {
 	worker.errorHandler = handler
+}
+
+func (worker *Worker) SetTaskErrorHandler(handler func(signature *tasks.Signature, err error)) {
+	worker.taskErrorHandler = handler
 }
 
 //SetPreTaskHandler sets a custom handler func before a job is started

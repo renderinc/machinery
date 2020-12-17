@@ -758,14 +758,14 @@ for _, result := range results {
 }
 ```
 
-#### Error Handling
+#### Task Error Handling
 
 When a task returns with an error, the default behavior is to first attempty to retry the task if it's retriable, otherwise log the error and then eventually call any error callbacks.
 
 To customize this, you can set a custom error handler on the worker which can do more than just logging after retries fail and error callbacks are trigerred:
 
 ```go
-worker.SetErrorHandler(func (err error) {
+worker.SetTaskErrorHandler(func (err error) {
   customHandler(err)
 })
 ```
